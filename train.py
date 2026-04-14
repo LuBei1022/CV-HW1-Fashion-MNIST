@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from data_loader import load_fashion_mnist
 from model import SimpleMLP, SGD 
 
-def calcualte_accuracy(model, X, y):
+def calculate_accuracy(model, X, y):
     prediction = model.predict(X)
     comparison = (prediction == y)
     accuracy = np.mean(comparison)
@@ -64,7 +64,7 @@ if __name__ == "__main__":
         avg_train_loss = epoch_loss / num_batches
         history["training_loss"].append(avg_train_loss)
         #在验证集上面测试
-        validation_accuracy = calcualte_accuracy(model, X_validation, y_validation)
+        validation_accuracy = calculate_accuracy(model, X_validation, y_validation)
         history["validation_accuracy"].append(validation_accuracy)
 
         optimizer.LR = optimizer.LR * lr_decay
