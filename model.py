@@ -2,7 +2,7 @@ import numpy as np
 
 class LinearLayer:
     def __init__(self, in_features, out_features):
-        self.W = np.random.randn(in_features, out_features) * 0.01
+        self.W = np.random.randn(in_features, out_features) * np.sqrt(2. / in_features) #hekaiming初始化
         self.b = np.zeros((1, out_features))
         self.x_cache = None
     
@@ -11,8 +11,8 @@ class LinearLayer:
         self.x_cache = x
         return z
 
-    def backward(self, dout):
-        self.dW = self.x_cache.T @ dout
+    def backward(self, dout, weight_decay = 0.0):
+        self.dW = self.x_cache.T @ dout + weight_decay * self.W #L2正则化
         self.db = np.sum(dout, axis = 0, keepdims = True)
         dx = dout @ self.W.T
         return dx
@@ -27,6 +27,19 @@ class ReLU:
     
     def backward(self, dout):
         dx = np.where(self.x_cache > 0, dout, 0)
+        return dx
+
+class Sigmoid:
+    def __init__(self):
+        self.y_cache = None
+    
+    def forward(self,x):
+        x_safe = np.clip(x, -500, 500)
+        self.y_cache = 1.0 / (1.0 + np.exp(- x_safe))
+        return self.y_cache
+    
+    def backward(self, dout):
+        dx = dout * self.y_cache * (1 - self.y_cache)
         return dx
 
     
@@ -56,26 +69,46 @@ class SoftmaxCrossEntropy:
         return dx
 
 class SimpleMLP:
-    def __init__(self):
-        self.fc1 = LinearLayer(in_features=28*28, out_features=128)
-        self.relu = ReLU()
-        self.fc2 = LinearLayer(in_features=128, out_features=10)
+    def __init__(self, input_dim = 784, hidden_dim1 = 128, hidden_dim2 = 56, output_dim = 10, activation1 = "ReLU", activation2 = "Sigmoid"):
+        self.fc1 = LinearLayer(in_features = input_dim, out_features = hidden_dim1)
+        if activation1 == "ReLU":
+            self.act1 = ReLU()
+        else:
+            self.act1 = Sigmoid()
+        self.fc2 = LinearLayer(in_features = hidden_dim1, out_features = hidden_dim2)
+        if activation2 == "Sigmoid":
+            self.act2 = Sigmoid()
+        else:
+            self.act2 = ReLU()
+        self.fc3 = LinearLayer(in_features = hidden_dim2, out_features = output_dim)
         self.loss_layer = SoftmaxCrossEntropy()
     
     def forward(self, x, y_true):
         fc1_forward = self.fc1.forward(x)
-        relu_forward = self.relu.forward(fc1_forward)
-        logits = self.fc2.forward(relu_forward)
+        act1_forward = self.act1.forward(fc1_forward)
+        fc2_forward = self.fc2.forward(act1_forward)
+        act2_forward = self.act2.forward(fc2_forward)
+        logits = self.fc3.forward(act2_forward)
         loss = self.loss_layer.forward(logits, y_true)
         return loss
 
-    def backward(self):
+    def backward(self, weight_decay = 0.0):
         dout_loss = self.loss_layer.backward()
-        dout_fc2 = self.fc2.backward(dout_loss)
-        dout_relu = self.relu.backward(dout_fc2)
-        dx = self.fc1.backward(dout_relu)
+        dout_fc3 = self.fc3.backward(dout_loss, weight_decay = weight_decay)
+        dout_act2 = self.act2.backward(dout_fc3)
+        dout_fc2 = self.fc2.backward(dout_act2, weight_decay = weight_decay)
+        dout_act1 = self.act1.backward(dout_fc2)
+        dx = self.fc1.backward(dout_act1, weight_decay = weight_decay)
         return dx
-
+    
+    def predict(self, x):
+        fc1_forward = self.fc1.forward(x)
+        act1_forward = self.act1.forward(fc1_forward)
+        fc2_forward = self.fc2.forward(act1_forward)
+        act2_forward = self.act2.forward(fc2_forward)
+        logits = self.fc3.forward(act2_forward)
+        return np.argmax(logits, axis=1)
+    
 class SGD:
     def __init__(self, learning_rate = 0.1):
         self.LR = learning_rate
@@ -87,6 +120,12 @@ class SGD:
         #更新model的fc2层
         model.fc2.W = model.fc2.W - self.LR * model.fc2.dW
         model.fc2.b = model.fc2.b - self.LR * model.fc2.db
+        #更新model的f3层
+        model.fc3.W = model.fc3.W - self.LR * model.fc3.dW
+        model.fc3.b = model.fc3.b - self.LR * model.fc3.db
+
+
+
 
         
 
