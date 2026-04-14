@@ -107,7 +107,7 @@ class SimpleMLP:
         fc2_forward = self.fc2.forward(act1_forward)
         act2_forward = self.act2.forward(fc2_forward)
         logits = self.fc3.forward(act2_forward)
-        return np.argmax(logits, axis=1)
+        return np.argmax(logits, axis=1) #选出logits里面得分最大的那个 作为predict的结果 返回的是最高分所在的索引即哪一类
     
 class SGD:
     def __init__(self, learning_rate = 0.1):
