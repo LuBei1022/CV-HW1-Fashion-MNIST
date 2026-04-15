@@ -4,6 +4,7 @@ import os
 import matplotlib.pyplot as plt
 from data_loader import load_fashion_mnist
 from model import SimpleMLP, SGD 
+from matplotlib.ticker import MaxNLocator
 
 def calculate_accuracy(model, X, y):
     prediction = model.predict(X)
@@ -11,23 +12,46 @@ def calculate_accuracy(model, X, y):
     accuracy = np.mean(comparison)
     return accuracy
 
-def plot_learning_curves(history):
-    plt.style.use('ggplot')
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
-    # 画 Loss 曲线
-    ax1.plot(history['training_loss'], label='Train Loss', color='tab:red', marker='o')
-    ax1.set_title('Training Loss over Epochs')
-    ax1.set_xlabel('Epochs')
-    ax1.set_ylabel('Loss')
-    ax1.legend()
-    # 画 Accuracy 曲线
-    ax2.plot(history['validation_accuracy'], label='Validation Accuracy', color='tab:blue', marker='s')
-    ax2.set_title('Validation Accuracy over Epochs')
-    ax2.set_xlabel('Epochs')
-    ax2.set_ylabel('Accuracy')
-    ax2.legend()
 
+def plot_learning_curves(history):
+    """
+    绘制训练过程的 Loss 和 Accuracy 曲线
+    """
+    plt.rcParams.update({'font.size': 12})
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+    
+    # ---------------------------------------------------------
+    # 1. 绘制 Loss 曲线 (左图)
+    # ---------------------------------------------------------
+    axes[0].plot(history['training_loss'], label='Train Loss', color='#d62728', marker='o', linewidth=2)
+    
+    # 【注意】如果你在 history 里也记录了 validation_loss，把下面这行取消注释
+    if 'validation_loss' in history:
+        axes[0].plot(history['validation_loss'], label='Validation Loss', color='#1f77b4', marker='s', linewidth=2)
+    axes[0].xaxis.set_major_locator(MaxNLocator(integer=True))   
+    axes[0].set_title('Training & Validation Loss', fontweight='bold')
+    axes[0].set_xlabel('Epochs')
+    axes[0].set_ylabel('Loss')
+    axes[0].legend()
+    axes[0].grid(True, linestyle='--', alpha=0.7) # 加上虚线网格
+    
+    # ---------------------------------------------------------
+    # 2. 绘制 Accuracy 曲线 (右图)
+    # ---------------------------------------------------------
+    axes[1].xaxis.set_major_locator(MaxNLocator(integer=True))
+    axes[1].plot(history['validation_accuracy'], label='Validation Accuracy', color='#2ca02c', marker='^', linewidth=2)
+    axes[1].set_title('Validation Accuracy', fontweight='bold')
+    axes[1].set_xlabel('Epochs')
+    axes[1].set_ylabel('Accuracy')
+    axes[1].legend()
+    axes[1].grid(True, linestyle='--', alpha=0.7)
+    
+    # ---------------------------------------------------------
+    # 调整布局并自动保存为高清图片
+    # ---------------------------------------------------------
     plt.tight_layout()
+    plt.savefig('learning_curves.png', dpi=300, bbox_inches='tight') 
+    print("训练曲线图已保存为 'learning_curves.png'")
     plt.show()
 
 if __name__ == "__main__":
@@ -64,6 +88,8 @@ if __name__ == "__main__":
         avg_train_loss = epoch_loss / num_batches
         history["training_loss"].append(avg_train_loss)
         #在验证集上面测试
+        val_loss = model.forward(X_validation, y_validation)
+        history.setdefault("validation_loss", []).append(val_loss)
         validation_accuracy = calculate_accuracy(model, X_validation, y_validation)
         history["validation_accuracy"].append(validation_accuracy)
 
