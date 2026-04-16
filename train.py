@@ -19,13 +19,9 @@ def plot_learning_curves(history):
     """
     plt.rcParams.update({'font.size': 12})
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-    
-    # ---------------------------------------------------------
-    # 1. 绘制 Loss 曲线 (左图)
-    # ---------------------------------------------------------
+    #绘制Loss曲线
     axes[0].plot(history['training_loss'], label='Train Loss', color='#d62728', marker='o', linewidth=2)
     
-    # 【注意】如果你在 history 里也记录了 validation_loss，把下面这行取消注释
     if 'validation_loss' in history:
         axes[0].plot(history['validation_loss'], label='Validation Loss', color='#1f77b4', marker='s', linewidth=2)
     axes[0].xaxis.set_major_locator(MaxNLocator(integer=True))   
@@ -33,11 +29,8 @@ def plot_learning_curves(history):
     axes[0].set_xlabel('Epochs')
     axes[0].set_ylabel('Loss')
     axes[0].legend()
-    axes[0].grid(True, linestyle='--', alpha=0.7) # 加上虚线网格
-    
-    # ---------------------------------------------------------
-    # 2. 绘制 Accuracy 曲线 (右图)
-    # ---------------------------------------------------------
+    axes[0].grid(True, linestyle='--', alpha=0.7)
+    #绘制 Accuracy 曲线
     axes[1].xaxis.set_major_locator(MaxNLocator(integer=True))
     axes[1].plot(history['validation_accuracy'], label='Validation Accuracy', color='#2ca02c', marker='^', linewidth=2)
     axes[1].set_title('Validation Accuracy', fontweight='bold')
@@ -45,10 +38,7 @@ def plot_learning_curves(history):
     axes[1].set_ylabel('Accuracy')
     axes[1].legend()
     axes[1].grid(True, linestyle='--', alpha=0.7)
-    
-    # ---------------------------------------------------------
-    # 调整布局并自动保存为高清图片
-    # ---------------------------------------------------------
+
     plt.tight_layout()
     plt.savefig('learning_curves.png', dpi=300, bbox_inches='tight') 
     print("训练曲线图已保存为 'learning_curves.png'")
@@ -56,12 +46,12 @@ def plot_learning_curves(history):
 
 if __name__ == "__main__":
     (X_train, y_train), (X_validation, y_validation),(X_test, y_test) = load_fashion_mnist(data_path = "data")
-    model = SimpleMLP(input_dim = 784, hidden_dim1 = 128, hidden_dim2 = 56, output_dim = 10, activation1 = "ReLU", activation2 = "Sigmoid")
-    optimizer = SGD(learning_rate = 0.1)
-    #设置超参数
+    model = SimpleMLP(input_dim = 784, hidden_dim1 = 256, hidden_dim2 = 56, output_dim = 10, activation1 = "ReLU", activation2 = "ReLU")
+    optimizer = SGD(learning_rate = 0.15)
+
     epochs = 20
     batch_size = 64
-    weight_decay = 0.001
+    weight_decay = 0.0001
     lr_decay = 0.95
     num_samples = X_train.shape[0]
     num_batches = num_samples // batch_size
@@ -94,7 +84,7 @@ if __name__ == "__main__":
         history["validation_accuracy"].append(validation_accuracy)
 
         optimizer.LR = optimizer.LR * lr_decay
-        print(f"第 {epoch+1:02d}/{epochs} 轮 | Train Loss: {avg_train_loss:.4f} | Validation Accuracy: {validation_accuracy * 100:.2f}% | 当前 LR: {optimizer.LR:.4f}")
+        print(f"Epoch {epoch+1:02d}/{epochs}  | Train Loss: {avg_train_loss:.4f} | Validation Accuracy: {validation_accuracy * 100:.2f}% | 当前 LR: {optimizer.LR:.4f}")
         
         #保存最好的
         if validation_accuracy > best_validation_accuracy:

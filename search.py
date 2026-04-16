@@ -12,13 +12,13 @@ if __name__ == "__main__":
     num_samples = X_train.shape[0]
     batch_size = 64
     num_batches = num_samples // batch_size
-    epochs = 10 
+    epochs = 30 
     lr_decay = 0.95
     #采用grid serch
     LR = [0.15, 0.1, 0.05, 0.01]
     hd1 = [128, 256]
     hd2 = [56, 64, 128]
-    weight_decay = [0.0, 0.0001, 0.001]
+    weight_decay = [0.0001, 0.001, 0.01]
     #组合起来
     combination = list(itertools.product(LR, hd1,hd2, weight_decay))
     global_best_accuracy = 0.0
@@ -29,6 +29,9 @@ if __name__ == "__main__":
         model = SimpleMLP(input_dim = 784, hidden_dim1 = hd1, hidden_dim2=hd2, output_dim=10, activation1="ReLU", activation2="ReLU")
         optimizer = SGD(learning_rate=LR)
         current_best_accuracy = 0.0
+        #早停法的初始化
+        patience = 3         
+        patience_counter = 0
         #开训
         for epoch in range(epochs):
             #打乱
@@ -45,9 +48,17 @@ if __name__ == "__main__":
             #验证集
             val_acc = calculate_accuracy(model, X_val, y_val)
             optimizer.LR *= lr_decay
+            print(f"Epoch {epoch + 1} validation accuracy: {val_acc * 100:.2f}%")
+
             if val_acc > current_best_accuracy:
                 current_best_accuracy = val_acc
-        print(f"本组accuracy: {current_best_accuracy * 100:.2f}%")
+                patience_counter = 0
+            else:
+                patience_counter += 1
+            if patience_counter > patience:
+                print("早停，本轮暂停\n")
+                break
+            
         if current_best_accuracy > global_best_accuracy:
             global_best_accuracy = current_best_accuracy
             best_combination = {"LR": LR, "hidden_dim1": hd1, "hidden_dim2": hd2, "weight_decay": weight_decay}

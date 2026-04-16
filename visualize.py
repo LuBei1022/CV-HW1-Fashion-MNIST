@@ -91,7 +91,6 @@ if __name__ == "__main__":
     with open('best_model.pkl', 'rb') as f:
         weights = pickle.load(f)
     
-    # 🌟 致命修正点：必须带上 activation 参数！！！
     from model import SimpleMLP
     model = SimpleMLP(input_dim=784, hidden_dim1=256, hidden_dim2=56, output_dim=10, 
                       activation1="ReLU", activation2="ReLU")
@@ -100,6 +99,9 @@ if __name__ == "__main__":
     model.fc2.W, model.fc2.b = weights['W2'], weights['b2']
     model.fc3.W, model.fc3.b = weights['W3'], weights['b3']
     
+    print("\n正在生成第一层权重可视化图")
+    visualize_first_layer_weights(model.fc1.W)
+
     class_names = ["T-shirt/top", "Trouser", "Pullover", "Dress", "Coat", 
                   "Sandal", "Shirt", "Sneaker", "Bag", "Ankle boot"]
     
