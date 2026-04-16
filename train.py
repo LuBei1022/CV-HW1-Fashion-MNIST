@@ -14,9 +14,6 @@ def calculate_accuracy(model, X, y):
 
 
 def plot_learning_curves(history):
-    """
-    绘制训练过程的 Loss 和 Accuracy 曲线
-    """
     plt.rcParams.update({'font.size': 12})
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
     #绘制Loss曲线

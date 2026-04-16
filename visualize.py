@@ -19,6 +19,7 @@ def visualize_first_layer_weights(W1, num_to_show=10):
         plt.axis('off')
     
     plt.suptitle("First Layer Weight Visualization (Spatial Patterns)")
+    plt.savefig('weight_visualization.png') #savepig必须放在show的前面，因为show会清空画布
     plt.show()
 
 import matplotlib.pyplot as plt
@@ -80,7 +81,8 @@ def plot_error_samples(model, X_test, y_test, class_names, max_samples=16):
         
     plt.suptitle(f"Error Analysis (Showing {len(selected_indices)} typical errors)", fontsize=16)
     plt.tight_layout()
-    plt.subplots_adjust(top=0.92) # 给主标题留点空
+    plt.subplots_adjust(top=0.92) 
+    plt.savefig('error_analysis.png') 
     plt.show()
 
 if __name__ == "__main__":
@@ -107,3 +109,4 @@ if __name__ == "__main__":
     
     print("\n正在生成错例分析图...")
     plot_error_samples(model, X_test, y_test, class_names)
+   
