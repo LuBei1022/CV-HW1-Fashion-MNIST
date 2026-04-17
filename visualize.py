@@ -2,24 +2,35 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pickle
 
-def visualize_first_layer_weights(W1, num_to_show=10):
-    plt.figure(figsize=(15, 3))
+def visualize_first_layer_weights(W1, num_to_show=40):
+    # 🌟 核心修改：定义行数和列数，4x10 = 40
+    rows = 4
+    cols = 10
+    
+    # 调大画布高度，(宽, 高) 设为 (15, 8) 比较合适
+    plt.figure(figsize=(15, 8)) 
+    
     indices = np.linspace(0, W1.shape[1] - 1, num_to_show, dtype=int)
     
     for i, idx in enumerate(indices):
-        # 提取第 idx 个神经元的权重 (784,)
         weight_vec = W1[:, idx]
-        # 恢复成图像尺寸 28x28
         weight_img = weight_vec.reshape(28, 28)
         
-        plt.subplot(1, num_to_show, i + 1)
-        # 使用 'RdBu' 或 'gray' 颜色映射，RdBu 能看出正负权重
+        # 🌟 修改这里：plt.subplot(行数, 列数, 当前第几个)
+        plt.subplot(rows, cols, i + 1)
         plt.imshow(weight_img, cmap='RdBu')
-        plt.title(f"Neuron {idx}")
+        
+        # 🌟 细节优化：把 "Neuron" 缩写成 "N"，并调小字号 fontsize=9
+        plt.title(f"N{idx}", fontsize=9) 
         plt.axis('off')
     
-    plt.suptitle("First Layer Weight Visualization (Spatial Patterns)")
-    plt.savefig('weight_visualization.png') #savepig必须放在show的前面，因为show会清空画布
+    plt.suptitle("First Layer Weight Visualization (40 Selected Neurons)", fontsize=16)
+    
+    # 🌟 关键两步：
+    plt.tight_layout()         # 自动调整子图间距，防止重叠
+    plt.subplots_adjust(top=0.88) # 给顶部的总标题留出空间，防止它压在第一行图上
+    
+    plt.savefig('weight_visualization.png', dpi=300) 
     plt.show()
 
 import matplotlib.pyplot as plt
