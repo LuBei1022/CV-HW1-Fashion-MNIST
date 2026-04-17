@@ -11,13 +11,13 @@ pickle
 ```
 
 ## 项目结构
-
+.
 ├── data/               # 存放 Fashion-MNIST 原始数据
-├── model.py            # MLP 核心架构与各层实现 (Linear, ReLU, Sigmoid等)
+├── best_model.pkl      # 训练完成的最佳模型权重文件
 ├── data_loader.py      # 数据加载、预处理、归一化与划分逻辑
+├── model.py            # MLP 核心架构与各层实现 (Linear, ReLU, Sigmoid等)
 ├── search.py           # 超参数网格搜索脚本
 ├── train.py            # 正式训练脚本（带模型保存机制）
 ├── test.py             # 测试集评估、权重可视化与错例分析脚本
-├── best_model.pkl      # 训练完成的最佳模型权重文件
 └── README.md           # 项目说明文档
 
