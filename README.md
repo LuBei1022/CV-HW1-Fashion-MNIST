@@ -11,7 +11,8 @@ pickle
 ```
 
 ## 项目结构
-.
+```text
+
 ├── data/               # 存放 Fashion-MNIST 原始数据
 ├── best_model.pkl      # 训练完成的最佳模型权重文件
 ├── data_loader.py      # 数据加载、预处理、归一化与划分逻辑
@@ -20,4 +21,4 @@ pickle
 ├── train.py            # 正式训练脚本（带模型保存机制）
 ├── test.py             # 测试集评估、权重可视化与错例分析脚本
 └── README.md           # 项目说明文档
-
+```
